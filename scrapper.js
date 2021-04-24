@@ -3,7 +3,7 @@ const cheerio = require('cheerio')
 const download = require('image-downloader');
 const fs = require('fs');
 const { Parser } = require('json2csv');
- const { Attribute1 ,Attribute2 ,Attribute3 ,Attribute4 ,Attribute5 ,Attribute6 ,Attribute7 ,Attribute8 ,Attribute9 ,Attribute10 } = require('./Variants')
+ const { Attributes,  Attribute1 ,Attribute2 ,Attribute3 ,Attribute4 ,Attribute5 ,Attribute6 ,Attribute7 ,Attribute8 ,Attribute9 ,Attribute10 } = require('./Variants')
 
  
 
@@ -81,8 +81,10 @@ async function Scrapper(){
         
         
         await variants(url);
-        let attribute1Name = Attribute1.Attribute1Name;
+        // let attribute1Name = Attribute1.Attribute1Name;
+        let {  attributeName , attributeValue } = Attributes(Attribute1);
 
+        console.log('function values are :  ' + attributeName, attributeValue);
         try {
             
                 nData.push({
@@ -118,18 +120,18 @@ async function Scrapper(){
                   price,
                   shortDescription,
                   imageUrl,
-                  attribute1Name
+                  attributeName
                   
   
                 })
               
           // Create  a  folder for each product 
              
-            const parser = new Parser
-            const csv = parser.parse(nData);
-          fs.writeFileSync('productsData.csv', csv, 'utf-8');
-          // await  imageDownloader(imageUrl,imgPath)
-            console.log(csv);
+          //   const parser = new Parser
+          //   const csv = parser.parse(nData);
+          // fs.writeFileSync('productsData.csv', csv, 'utf-8');
+          // // await  imageDownloader(imageUrl,imgPath)
+          //   console.log(csv);
           } catch(error){
             console.log(`Error's : ${error}`)
           }

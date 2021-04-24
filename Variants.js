@@ -63,7 +63,9 @@ module.exports.Attribute10 = {
 
 module.exports.Attributes = (attibute ) => {
     let attributeName = attibute.AttributeName;
-    let attributeValue = attibute.AttributeName;
+    let attributeValue = attibute.AttributeValues
     let attributeVisible = attibute.AttributeVisible;
     let attributeGlobal = attibute.AttributeGlobal;
+
+    return {  attributeName , attributeValue , attributeVisible , attributeGlobal }
 }
