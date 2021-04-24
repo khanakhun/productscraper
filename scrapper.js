@@ -3,18 +3,48 @@ const cheerio = require('cheerio')
 const download = require('image-downloader');
 const fs = require('fs');
 const { Parser } = require('json2csv');
-const nData = [];
+ const { Attributes,  Attribute1 ,Attribute2 ,Attribute3 ,Attribute4 ,Attribute5 ,Attribute6 ,Attribute7 ,Attribute8 ,Attribute9 ,Attribute10 } = require('./Variants')
 
-let size = '';
-let material = '';
-let printOptions = '';
-let laminations = '';
-let artwork = '';
-let pdfProof = '';
-let quantity = '';
-let delievery = '';
-let graphics = '';
-let color = '';
+ 
+
+const nData = [];
+let ID;
+let Type;
+let Name;
+let SKU;
+let Size = [];
+let Shortdescription;
+let price;
+let Published = 1;
+let isFeatured = 0;
+let Visibilityincatalogue = 'visible';
+let Description = '';
+let shortDescription;
+let Datesalepriceends ;
+let Taxstatus ;
+let Taxclass ;
+let Instock = 1;
+let Stock ;
+let LowStockAmount ;
+let BackordersAllowed = 0;
+let SoldIndividually;
+let WeightKG;
+let LengthCM;
+let WidthCM;
+let HeightCM;
+let AllowCustomerReviews;
+let PurchaseNote;
+let SalePrice;
+let RegularPrice;
+let Categories;
+let Tags;
+let ShippingClass;
+let Image;
+let Position = 0;
+let imageUrl;
+let SoldIndividuall;
+// 
+
 
 async function Scrapper(){
     try {
@@ -42,49 +72,66 @@ async function Scrapper(){
 
 
 
-        const title =  await $('.product-title').text();
-        const subtitle =  await $('.prod-content h2').text();
-        const descripition = await $('.prod-content > p').text();
-        const price = await $('#order-price').text()
-        const imageUrl = await $('.woocommerce-product-gallery ').find('img').attr('src');
+        let Name =  await $('.product-title').text();
+        let Shortdescription =  await $('.prod-content h2').text();
+        let shortDescription = await $('.woocommerce-product-details__short-description').text().trim();
+        let Description =  await $('.spoints').text();
+        let price = await $('#order-price').text()
+        let imageUrl = await $('.woocommerce-product-gallery ').find('img').attr('src');
+        
         
         await variants(url);
+        // let attribute1Name = Attribute1.Attribute1Name;
+        let {  attributeName , attributeValue } = Attributes(Attribute1);
 
-
+        console.log('function values are :  ' + attributeName, attributeValue);
         try {
-              const imgPath = fs.mkdirSync(`./products/${title}`, {recursive: true}, function(err) {
-              if (err) {
-                console.log(err)
-              } else {
-              console.log(`${title} Directory Created Successfully`)
-            }
-          })
+            
                 nData.push({
-                  title,
-                  subtitle,
+                  ID,
+                  Type,
+                  SKU,
+                  Name,
+                  Published,
+                  isFeatured,
+                  Visibilityincatalogue,
+                  Shortdescription,
+                  Description,
+                  Datesalepriceends,
+                  Taxstatus,
+                  Taxclass,
+                  Instock,
+                  Stock,
+                  LowStockAmount,
+                  BackordersAllowed  ,
+                  SoldIndividuall,
+                  WeightKG,
+                  LengthCM,
+                  WidthCM,
+                  HeightCM,
+                  AllowCustomerReviews,
+                  PurchaseNote,
+                  SalePrice,
+                  RegularPrice,
+                  Categories,
+                  Tags,
+                  ShippingClass,
+                  Position  ,
                   price,
-                  descripition,
+                  shortDescription,
                   imageUrl,
-                  size,
-                  material,
-                  printOptions,
-                  laminations,
-                  artwork,
-                  pdfProof,
-                  quantity,
-                  delievery,
-                  color,
-                  graphics
-                   
+                  attributeName
+                  
+  
                 })
               
           // Create  a  folder for each product 
              
-            const parser = new Parser
-            const csv = parser.parse(nData);
-          fs.writeFileSync(`${imgPath}/${title}.csv`, csv, 'utf-8');
-          await  imageDownloader(imageUrl,imgPath)
-            console.log(csv);
+          //   const parser = new Parser
+          //   const csv = parser.parse(nData);
+          // fs.writeFileSync('productsData.csv', csv, 'utf-8');
+          // // await  imageDownloader(imageUrl,imgPath)
+          //   console.log(csv);
           } catch(error){
             console.log(`Error's : ${error}`)
           }
@@ -93,71 +140,124 @@ async function Scrapper(){
           
       }
 
-      async function imageDownloader(imageUrl,imgPath){
-       
-        const options = {
-            url: imageUrl,
-            dest: imgPath               // will be saved to /path/to/dest/image.jpg
-          }
-          
-         await  download.image(options)
-            .then(({ filename }) => {
-              console.log(' %c Saved to','color: red', filename)  // saved to /path/to/dest/image.jpg
-            })
-            .catch((err) => console.error(err))
-
-      }
-  // Main Scrapper Executes
-  Main()
-  
+     
+ 
 
   // Function to get Variations of a product from
   async function variants(url) {
-     const res = await axios.get(url);
-    const $ = cheerio.load(res.data);
+    const res = await axios.get(url);
+   const $ = cheerio.load(res.data);
+   
+   $('#tm-epo-field-1 > div > .cpf_hide_element ').map(async (index, ele) => {
+     const variants = $(ele).find($('.tm-epo-field-label')).text();
+     const value = $(ele).find($('.tmcp-field')).text();
     
-    $('#tm-epo-field-1 > div > .cpf_hide_element ').map(async (index, ele) => {
-      
-      
-      const variants = $(ele).find($('.tm-epo-field-label')).text();
-      const value = $(ele).find($('.tmcp-field')).text();
-      console.log(variants)
-      if (variants === 'Size') {
-        size = $(ele).find($('.tmcp-field')).text().trim();
-        console.log(`Size is : ${size}`)
-      } else if (variants === 'Material') {
-        material = $(ele).find($('.tmcp-field')).text().trim();
-        console.log(`material is : ${material}`)
-      } else if (variants === 'Print Options') {
-        printOptions = $(ele).find($('.tmcp-field')).text().trim();
-        console.log(`printOptions is : ${printOptions}`)
-      } else if (variants === 'Lamination') {
-        laminations = $(ele).find($('.tmcp-field')).text().trim();
-        console.log(`Lamination is : ${laminations}`)
-      } else if (variants === 'Artwork') {
-        artwork = $(ele).find($('.tmcp-field')).text().trim();
-        console.log(`Artwork is : ${artwork}`)
-      } else if (variants === 'PDF Proof') {
-        pdfProof = $(ele).find($('.tmcp-field')).text().trim();
-        console.log(`pdfProof is : ${pdfProof}`)
-      } else if (variants === 'Quantity') {
-        quantity = $(ele).find($('.tmcp-field')).text().trim();
-        console.log(`quantity is : ${quantity}`)
-      } else if (variants === 'Delivery') {
-        delievery = $(ele).find($('.tmcp-field')).text().trim();
-        console.log(`delievery is : ${delievery}`)
-      } else if (variants === 'Colour') {
-        color = $(ele).find($('.tmcp-field')).text().trim();
-        console.log(`color is : ${color}`)
-      } else if (variants === 'Graphics') {
-        graphics = $(ele).find($('.tmcp-field')).text().trim();
-        console.log(`graphics is : ${graphics}`)
-      }
+     if (variants === 'Size') {
+      let size= $(ele).find($('.tmcp-field'));
+      Attribute1.AttributeName = variants;
+      console.log(`Name is : ${Attribute1.AttributeName}`)
+     let options = $(size).find('.tc-multiple-option');
+     options.map( async (i,e) => {
+       const attribute1 = $(e).text();
+       Attribute1.AttributeValues.push(attribute1);
+     })
+       console.log(`Size attributes are  is : ${ Attribute1.AttributeValues}`)
 
-    })
+     } else if (variants === 'Material') {
+     let  material= $(ele).find($('.tmcp-field'));
+      Attribute2.AttributeName = variants;
+      console.log(`Name is : ${Attribute2.AttributeName }`)
+     let options = $(material).find('.tc-multiple-option');
+     options.map( async (i,e) => {
+       const attribute2 = $(e).text();
+       Attribute2.Attribute2Values.push(attribute2);
+     })
+       console.log(`material attributes are  is : ${ Attribute2.AttributeValues}`)
+     } else if (variants === 'Print Options') {
+     let  printOptions= $(ele).find($('.tmcp-field'));
+      Attribute3.AttributeName = variants;
+      console.log(`Name is : ${Attribute3.AttributeName }`)
+     let options = $(printOptions).find('.tc-multiple-option');
+     options.map( async (i,e) => {
+       const attribute3 = $(e).text();
+       Attribute3.Attribute3Values.push(attribute3);
+     })
+       console.log(`printOptions attributes are  is : ${ Attribute3.AttributeValues}`)
+     } else if (variants === 'Lamination') {
+      let laminations= $(ele).find($('.tmcp-field'));
+      Attribute4.AttributeName = variants;
+      console.log(`Name is : ${Attribute4.AttributeName }`)
+     let options = $(laminations).find('.tc-multiple-option');
+     options.map( async (i,e) => {
+       const attribute4 = $(e).text();
+       Attribute4.Attribute4Values.push(attribute4);
+     })
+       console.log(`laminations attributes are  is : ${ Attribute4.AttributeValues}`)
+     } else if (variants === 'Artwork') {
+      let artwork= $(ele).find($('.tmcp-field'));
+      Attribute5.AttributeName = variants;
+      console.log(`Name is : ${Attribute5.AttributeName }`)
+     let options = $(artwork).find('.tc-multiple-option');
+     options.map( async (i,e) => {
+       const attribute5 = $(e).text();
+       Attribute5.Attribute5Values.push(attribute5);
+     })
+       console.log(`artwork attributes are  is : ${ Attribute5.AttributeValues}`)
+     } else if (variants === 'PDF Proof') {
+      let pdfProof= $(ele).find($('.tmcp-field'));
+      Attribute6.AttributeName = variants;
+      console.log(`Name is : ${Attribute6.AttributeName }`)
+     let options = $(pdfProof).find('.tc-multiple-option');
+     options.map( async (i,e) => {
+       const attribute6 = $(e).text();
+       Attribute6.Attribute6Values.push(attribute6);
+     })
+       console.log(`pdfProof attributes are  is : ${ Attribute6.AttributeValues}`)
+     } else if (variants === 'Quantity') {
+      let quantity= $(ele).find($('.tmcp-field'));
+      Attribute7.AttributeName = variants;
+      console.log(`Name is : ${Attribute7.AttributeName }`)
+     let options = $(quantity).find('.tc-multiple-option');
+     options.map( async (i,e) => {
+       const attribute7 = $(e).text();
+       Attribute7.Attribute7Values.push(attribute7);
+     })
+       console.log(`quantity attributes are  is : ${ Attribute7.AttributeValues}`)
+     } else if (variants === 'Delivery') {
+      let delievery= $(ele).find($('.tmcp-field'));
+      Attribute8.AttributeName = variants;
+      console.log(`Name is : ${Attribute8.AttributeName }`)
+     let options = $(delievery).find('.tc-multiple-option');
+     options.map( async (i,e) => {
+       const attribute8 = $(e).text();
+       Attribute8.Attribute8Values.push(attribute8);
+     })
+       console.log(`delievery attributes are  is : ${ Attribute8.AttributeValues}`)
+     } else if (variants === 'Colour') {
+      let color = $(ele).find($('.tmcp-field'));
+      Attribute9.AttributeName = variants;
+      console.log(`Name is : ${Attribute9.AttributeName }`)
+     let options = $(color).find('.tc-multiple-option');
+     options.map( async (i,e) => {
+       const attribute9 = $(e).text();
+       Attribute9.Attribute9Values.push(attribute9);
+     })
+       console.log(`color  attributes are  is : ${ Attribute9.AttributeValues}`)
+     } else if (variants === 'Graphics') {
+     let  graphic= $(ele).find($('.tmcp-field'));
+      Attribute10.AttributeName = variants;
+      console.log(`Name is : ${Attribute10.AttributeName }`)
+     let options = $(graphic).find('.tc-multiple-option');
+     options.map( async (i,e) => {
+       const attribute10 = $(e).text();
+       Attribute10.AttributeValues.push(attribute10);
+     })
+       console.log(`graphic attributes are  is : ${ Attribute10.AttributeValues}`)
+     }
 
-  }
+   })
 
+ }
 };
   
     Scrapper();

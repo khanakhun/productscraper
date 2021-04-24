@@ -1,177 +1,539 @@
-const request = require("request-promise");
-const cheerio = require("cheerio");
-const { Parser } = require("json2csv");
-const fs = require("fs");
-let url = "https://www.loopnet.com/biz/businesses-for-sale";
-let results = {};
-let nData = [];
+const axios = require('axios')
+const cheerio = require('cheerio')
+const download = require('image-downloader');
+const fs = require('fs');
+const { Parser } = require('json2csv');
+const nData = [];
 
-let AskingPrice = "";
-let CashFlow = "";
-let GrossRevenue = "";
-let Rent = "";
-let Inventory = "";
-let EstablishedYear = "";
-let FFE = "";
-let EBITDA = "";
+let size = '';
+let material = '';
+let printOptions = '';
+let laminations = '';
+let artwork = '';
+let pdfProof = '';
+let quantity = '';
+let delievery = '';
+let graphics = '';
+let color = '';
 
-let baseURL =
-  "https://www.loopnet.com/biz/businesses-for-sale?q=bGM9SmtjOU1UQW1RejFWVXc9PQ%3D%3D";
-(async () => {
-  const res = await request.get(baseURL);
-  const $ = await cheerio.load(res);
-  const pagination = $(
-    "#top > section > main > section > app-root > app-search-results > div > div > section.links.ng-star-inserted > div > app-listings-pagination > div > pagination-template > ul > li:nth-child(8) > a > span"
-  ).text();
-
-  for (index = 0; index <= pagination; index++) {
-    const result = await request.get(`${baseURL}/${index}`);
-    const $ = await cheerio.load(result);
-    $(".pointer").each(async function () {
-      jobArray = $(this).attr("href");
-
-      await Scrapper(`https://www.loopnet.com/${jobArray}`);
-    });
-  }
-
-  jobArray = $(this).attr("href");
-
-  async function Scrapper(url) {
-    const res = await request.get(url);
-    const $ = await cheerio.load(res);
-
-    const title = $(".listingDetailHeading").text();
-    const location = $(".listingDetailHeadRegion ").text();
-    const descripition = $(".descriptionAd ").text();
-    const sellerName = $(".seller-name-no-image").text();
-    const brokerCompany = $(".broker-company-information ").text();
-    const contact = $("ln-icon-phone-filled").text();
-    const tbody1 = $(
-      "#imageCon > app-listing-detail-presentation > div > div.col-12.col-parent.mobile-col-6.pricing.text-light > div.col-6.col-parent.mobile-col-6 > table > tbody"
-    );
-    const tbody2 = $(
-      "#imageCon > app-listing-detail-presentation > div > div.col-12.col-parent.mobile-col-6.pricing.text-light > div.col-6.mobile-col-6.data-point > table > tbody"
-    );
-
-    tbody1.each(async (index, element) => {
-      const lntt = element.children.length;
-
-      for (let i = 0; i < lntt; i++) {
-        const selector = $(element)
-          .find(
-            `tr:nth-child(${i}) td:nth-child(${1}) 
-        \n`
-          )
-          .text();
-        if (selector === "Asking Price:") {
-          // console.log("asking Price is here");
-          AskingPrice = $(element)
-            .find(`tr:nth-child(${i})  td:nth-child(${2}) `)
-            .text();
-        } else if (selector === "Gross Revenue:") {
-          GrossRevenue = $(element)
-            .find(`tr:nth-child(${i})  td:nth-child(${2}) `)
-            .text();
-        } else if (selector === "Established Year:") {
-          EstablishedYear = $(element)
-            .find(`tr:nth-child(${i})  td:nth-child(${2}) `)
-            .text();
-        } else if (selector === "Rent:") {
-          Rent = $(element)
-            .find(`tr:nth-child(${i})  td:nth-child(${2}) `)
-            .text();
-        } else if (selector === "FF&E:") {
-          FFE = $(element)
-            .find(`tr:nth-child(${i})  td:nth-child(${2}) `)
-            .text();
-        } else if (selector === "Inventory:") {
-          Inventory = $(element)
-            .find(`tr:nth-child(${i})  td:nth-child(${2}) `)
-            .text();
-        } else if (selector === "EBITDA:") {
-          EBITDA = $(element)
-            .find(`tr:nth-child(${i})  td:nth-child(${2}) `)
-            .text();
-        } else if (selector === "Cash Flow:") {
-          CashFlow = $(element)
-            .find(`tr:nth-child(${i})  td:nth-child(${2}) `)
-            .text();
-        }
-      }
-    });
-
-    // second tbody
-    tbody2.each(async (index, element) => {
-      const lntt = element.children.length;
-
-      for (let i = 0; i < lntt; i++) {
-        const selector = $(element)
-          .find(
-            `tr:nth-child(${i}) td:nth-child(${1}) 
-        \n`
-          )
-          .text();
-        if (selector === "Asking Price:") {
-          // console.log("asking Price is here");
-          AskingPrice = $(element)
-            .find(`tr:nth-child(${i})  td:nth-child(${2}) `)
-            .text();
-        } else if (selector === "Gross Revenue:") {
-          GrossRevenue = $(element)
-            .find(`tr:nth-child(${i})  td:nth-child(${2}) `)
-            .text();
-        } else if (selector === "Established Year:") {
-          EstablishedYear = $(element)
-            .find(`tr:nth-child(${i})  td:nth-child(${2}) `)
-            .text();
-        } else if (selector === "Rent:") {
-          Rent = $(element)
-            .find(`tr:nth-child(${i})  td:nth-child(${2}) `)
-            .text();
-        } else if (selector === "FF&E:") {
-          FFE = $(element)
-            .find(`tr:nth-child(${i})  td:nth-child(${2}) `)
-            .text();
-        } else if (selector === "Inventory:") {
-          Inventory = $(element)
-            .find(`tr:nth-child(${i})  td:nth-child(${2}) `)
-            .text();
-        } else if (selector === "EBITDA:") {
-          EBITDA = $(element)
-            .find(`tr:nth-child(${i})  td:nth-child(${2}) `)
-            .text();
-        } else if (selector === "Cash Flow:") {
-          CashFlow = $(element)
-            .find(`tr:nth-child(${i})  td:nth-child(${2}) `)
-            .text();
-        }
-      }
-    });
-
+async function Scrapper(){
     try {
-      nData.push({
-        title,
-        location,
-        AskingPrice,
-        CashFlow,
-        GrossRevenue,
-        Rent,
-        Inventory,
-        EstablishedYear,
-        FFE,
-        EBITDA,
-        descripition,
-        brokerCompany,
-        contact,
-        sellerName,
-        url,
-      });
-      const parser = new Parser();
-      const csv = parser.parse(nData);
-      fs.writeFileSync("./onlineBuissnessupdate.csv", csv, "utf-8");
-      console.log(csv);
-    } catch (err) {
-      console.log(`Error : ${err}`);
-    }
+        const response = await axios.get('https://cheapasprints.com/shop/signage-printing/pavement-signs-and-a-boards/');
+        const $ = await  cheerio.load(response.data);
+
+
+        // $('.cat-products').map( async (index, ele) => {
+        //    const url =  $(ele).find('a').attr('href')
+        //    await Main(url)
+        // })
+
+        // $('.cat-products li').map(async (index,element)=>{
+        //     const url = await $(element).find('a').attr('href');
+        //     console.log(url)
+        //     await Main(url)
+        // })
+      } catch (error) {
+        console.error(`Error occured at : ${error}`);
+      }
+
+      async function Main(url){
+        const res = await axios.get(url);
+        const $ = await cheerio.load(res.data);
+
+
+
+        const title =  await $('.product-title').text();
+        const subtitle =  await $('.prod-content h2').text();
+        const descripition = await $('.prod-content > p').text();
+        const price = await $('#order-price').text()
+        const imageUrl = await $('.woocommerce-product-gallery ').find('img').attr('src');
+        
+        await variants(url);
+
+
+        try {
+              const imgPath = fs.mkdirSync(`./products/${title}`, {recursive: true}, function(err) {
+              if (err) {
+                console.log(err)
+              } else {
+              console.log(`${title} Directory Created Successfully`)
+            }
+          })
+                nData.push({
+                  title,
+                  subtitle,
+                  price,
+                  descripition,
+                  imageUrl,
+                  size,
+                  material,
+                  printOptions,
+                  laminations,
+                  artwork,
+                  pdfProof,
+                  quantity,
+                  delievery,
+                  color,
+                  graphics
+                   
+                })
+              
+          // Create  a  folder for each product 
+             
+            const parser = new Parser
+            const csv = parser.parse(nData);
+          fs.writeFileSync(`${imgPath}/${title}.csv`, csv, 'utf-8');
+          await  imageDownloader(imageUrl,imgPath)
+            console.log(csv);
+          } catch(error){
+            console.log(`Error's : ${error}`)
+          }
+      
+
+          
+      }
+
+      async function imageDownloader(imageUrl,imgPath){
+       
+        const options = {
+            url: imageUrl,
+            dest: imgPath               // will be saved to /path/to/dest/image.jpg
+          }
+          
+         await  download.image(options)
+            .then(({ filename }) => {
+              console.log(' %c Saved to','color: red', filename)  // saved to /path/to/dest/image.jpg
+            })
+            .catch((err) => console.error(err))
+
+      }
+  // Main Scrapper Executes
+  Main('https://cheapasprints.com/product/a5-flyers-and-leaflets-printing/');
+  
+
+  // Function to get Variations of a product from
+  async function variants(url) {
+     const res = await axios.get(url);
+    const $ = cheerio.load(res.data);
+    
+    $('#tm-epo-field-1 > div > .cpf_hide_element ').map(async (index, ele) => {
+      
+      
+      const variants = $(ele).find($('.tm-epo-field-label')).text();
+      const value = $(ele).find($('.tmcp-field')).text();
+      console.log(variants)
+      if (variants === 'Size') {
+        size = $(ele).find($('.tmcp-field')).text().trim();
+        console.log(`Size is : ${size}`)
+      } else if (variants === 'Material') {
+        material = $(ele).find($('.tmcp-field')).text().trim();
+        console.log(`material is : ${material}`)
+      } else if (variants === 'Print Options') {
+        printOptions = $(ele).find($('.tmcp-field')).text().trim();
+        console.log(`printOptions is : ${printOptions}`)
+      } else if (variants === 'Lamination') {
+        laminations = $(ele).find($('.tmcp-field')).text().trim();
+        console.log(`Lamination is : ${laminations}`)
+      } else if (variants === 'Artwork') {
+        artwork = $(ele).find($('.tmcp-field')).text().trim();
+        console.log(`Artwork is : ${artwork}`)
+      } else if (variants === 'PDF Proof') {
+        pdfProof = $(ele).find($('.tmcp-field')).text().trim();
+        console.log(`pdfProof is : ${pdfProof}`)
+      } else if (variants === 'Quantity') {
+        quantity = $(ele).find($('.tmcp-field')).text().trim();
+        console.log(`quantity is : ${quantity}`)
+      } else if (variants === 'Delivery') {
+        delievery = $(ele).find($('.tmcp-field')).text().trim();
+        console.log(`delievery is : ${delievery}`)
+      } else if (variants === 'Colour') {
+        color = $(ele).find($('.tmcp-field')).text().trim();
+        console.log(`color is : ${color}`)
+      } else if (variants === 'Graphics') {
+        graphics = $(ele).find($('.tmcp-field')).text().trim();
+        console.log(`graphics is : ${graphics}`)
+      }
+
+    })
+
   }
-})();
+
+};
+  
+    Scrapper();
+
+
+    const axios = require('axios')
+const cheerio = require('cheerio')
+const download = require('image-downloader');
+const fs = require('fs');
+const { Parser } = require('json2csv');
+// const { Attribute1 ,Attribute2 ,Attribute3 ,Attribute4 ,Attribute5 ,Attribute6 ,Attribute7 ,Attribute8 ,Attribute9 ,Attribute10 } = require('./Variants')
+const Attributes = require('./Variants')
+
+
+const nData = [];
+let ID;
+let Type;
+let Name;
+let SKU;
+let Size = [];
+let Shortdescription;
+let price;
+let Published = 1;
+let isFeatured = 0;
+let Visibilityincatalogue = 'visible';
+let Description = '';
+let shortDescription;
+let Datesalepriceends ;
+let Taxstatus ;
+let Taxclass ;
+let Instock = 1;
+let Stock ;
+let LowStockAmount ;
+let BackordersAllowed = 0;
+let SoldIndividually;
+let WeightKG;
+let LengthCM;
+let WidthCM;
+let HeightCM;
+let AllowCustomerReviews;
+let PurchaseNote;
+let SalePrice;
+let RegularPrice;
+let Categories;
+let Tags;
+let ShippingClass;
+let Image;
+let Position = 0;
+let imageUrl;
+let SoldIndividuall;
+// 
+
+
+async function Scrapper(){
+    try {
+        const response = await axios.get('https://cheapasprints.com/shop/signage-printing/pavement-signs-and-a-boards/');
+        const $ = await  cheerio.load(response.data);
+
+
+        // $('.cat-products').map( async (index, ele) => {
+        //    const url =  $(ele).find('a').attr('href')
+        //    await Main(url)
+        // })
+
+        $('.cat-products li').map(async (index,element)=>{
+            const url = await $(element).find('a').attr('href');
+            console.log(url)
+            await Main(url)
+        })
+      } catch (error) {
+        console.error(`Error occured at : ${error}`);
+      }
+
+      async function Main(url){
+        const res = await axios.get(url);
+        const $ = await cheerio.load(res.data);
+
+
+
+        let Name =  await $('.product-title').text();
+        let Shortdescription =  await $('.prod-content h2').text();
+        let shortDescription = await $('.woocommerce-product-details__short-description').text().trim();
+        let Description =  await $('.spoints').text();
+        let price = await $('#order-price').text()
+        let imageUrl = await $('.woocommerce-product-gallery ').find('img').attr('src');
+        
+        
+        await variants(url);
+
+
+        try {
+            
+                nData.push({
+                  ID,
+                  Type,
+                  SKU,
+                  Name,
+                  Published,
+                  isFeatured,
+                  Visibilityincatalogue,
+                  Shortdescription,
+                  Description,
+                  Datesalepriceends,
+                  Taxstatus,
+                  Taxclass,
+                  Instock,
+                  Stock,
+                  LowStockAmount,
+                  BackordersAllowed  ,
+                  SoldIndividuall,
+                  WeightKG,
+                  LengthCM,
+                  WidthCM,
+                  HeightCM,
+                  AllowCustomerReviews,
+                  PurchaseNote,
+                  SalePrice,
+                  RegularPrice,
+                  Categories,
+                  Tags,
+                  ShippingClass,
+                  Position  ,
+                  price,
+                  shortDescription,
+                  imageUrl,
+  
+                })
+              
+          // Create  a  folder for each product 
+             
+            const parser = new Parser
+            const csv = parser.parse(nData);
+          fs.writeFileSync('productsData.csv', csv, 'utf-8');
+          // await  imageDownloader(imageUrl,imgPath)
+            console.log(csv);
+          } catch(error){
+            console.log(`Error's : ${error}`)
+          }
+      
+
+          
+      }
+
+     
+ 
+
+  // Function to get Variations of a product from
+  async function variants(url) {
+    const res = await axios.get(url);
+   const $ = cheerio.load(res.data);
+   
+   $('#tm-epo-field-1 > div > .cpf_hide_element ').map(async (index, ele) => {
+     const variants = $(ele).find($('.tm-epo-field-label')).text();
+     const value = $(ele).find($('.tmcp-field')).text();
+    
+     if (variants === 'Size') {
+      let size= $(ele).find($('.tmcp-field'));
+      Attribute1.Attribute1Name = variants;
+      console.log(`Name is : ${Attribute1.Attribute1Name}`)
+     let options = $(size).find('.tc-multiple-option');
+     options.map( async (i,e) => {
+       const attribute1 = $(e).text();
+       Attribute1.Attribute1Values.push(attribute1);
+     })
+       console.log(`Size attributes are  is : ${ Attribute1.Attribute1Values}`)
+
+     } else if (variants === 'Material') {
+     let  material= $(ele).find($('.tmcp-field'));
+      Attribute2.Attribute2Name = variants;
+      console.log(`Name is : ${Attribute2.Attribute2Name }`)
+     let options = $(material).find('.tc-multiple-option');
+     options.map( async (i,e) => {
+       const attribute2 = $(e).text();
+       Attribute2.Attribute2Values.push(attribute2);
+     })
+       console.log(`material attributes are  is : ${ Attribute2.Attribute2Values}`)
+     } else if (variants === 'Print Options') {
+     let  printOptions= $(ele).find($('.tmcp-field'));
+      Attribute3.Attribute3Name = variants;
+      console.log(`Name is : ${Attribute3.Attribute3Name }`)
+     let options = $(printOptions).find('.tc-multiple-option');
+     options.map( async (i,e) => {
+       const attribute3 = $(e).text();
+       Attribute3.Attribute3Values.push(attribute3);
+     })
+       console.log(`printOptions attributes are  is : ${ Attribute3.Attribute3Values}`)
+     } else if (variants === 'Lamination') {
+      let laminations= $(ele).find($('.tmcp-field'));
+      Attribute4.Attribute4Name = variants;
+      console.log(`Name is : ${Attribute4.Attribute4Name }`)
+     let options = $(laminations).find('.tc-multiple-option');
+     options.map( async (i,e) => {
+       const attribute4 = $(e).text();
+       Attribute4.Attribute4Values.push(attribute4);
+     })
+       console.log(`laminations attributes are  is : ${ Attribute4.Attribute4Values}`)
+     } else if (variants === 'Artwork') {
+      let artwork= $(ele).find($('.tmcp-field'));
+      Attribute5.Attribute5Name = variants;
+      console.log(`Name is : ${Attribute5.Attribute5Name }`)
+     let options = $(artwork).find('.tc-multiple-option');
+     options.map( async (i,e) => {
+       const attribute5 = $(e).text();
+       Attribute5.Attribute5Values.push(attribute5);
+     })
+       console.log(`artwork attributes are  is : ${ Attribute5.Attribute5Values}`)
+     } else if (variants === 'PDF Proof') {
+      let pdfProof= $(ele).find($('.tmcp-field'));
+      Attribute6.Attribute6Name = variants;
+      console.log(`Name is : ${Attribute6.Attribute6Name }`)
+     let options = $(pdfProof).find('.tc-multiple-option');
+     options.map( async (i,e) => {
+       const attribute6 = $(e).text();
+       Attribute6.Attribute6Values.push(attribute6);
+     })
+       console.log(`pdfProof attributes are  is : ${ Attribute6.Attribute6Values}`)
+     } else if (variants === 'Quantity') {
+      let quantity= $(ele).find($('.tmcp-field'));
+      Attribute7.Attribute7Name = variants;
+      console.log(`Name is : ${Attribute7.Attribute7Name }`)
+     let options = $(quantity).find('.tc-multiple-option');
+     options.map( async (i,e) => {
+       const attribute7 = $(e).text();
+       Attribute7.Attribute7Values.push(attribute7);
+     })
+       console.log(`quantity attributes are  is : ${ Attribute7.Attribute7Values}`)
+     } else if (variants === 'Delivery') {
+      let delievery= $(ele).find($('.tmcp-field'));
+      Attribute8.Attribute8Name = variants;
+      console.log(`Name is : ${Attribute8.Attribute8Name }`)
+     let options = $(delievery).find('.tc-multiple-option');
+     options.map( async (i,e) => {
+       const attribute8 = $(e).text();
+       Attribute8.Attribute8Values.push(attribute8);
+     })
+       console.log(`delievery attributes are  is : ${ Attribute8.Attribute8Values}`)
+     } else if (variants === 'Colour') {
+      let color = $(ele).find($('.tmcp-field'));
+      Attribute9.Attribute9Name = variants;
+      console.log(`Name is : ${Attribute9.Attribute9Name }`)
+     let options = $(color).find('.tc-multiple-option');
+     options.map( async (i,e) => {
+       const attribute9 = $(e).text();
+       Attribute9.Attribute9Values.push(attribute9);
+     })
+       console.log(`color  attributes are  is : ${ Attribute9.Attribute9Values}`)
+     } else if (variants === 'Graphics') {
+     let  graphic= $(ele).find($('.tmcp-field'));
+      Attribute10.Attribute10Name = variants;
+      console.log(`Name is : ${Attribute10.Attribute10Name }`)
+     let options = $(graphic).find('.tc-multiple-option');
+     options.map( async (i,e) => {
+       const attribute10 = $(e).text();
+       Attribute10.Attribute10Values.push(attribute10);
+     })
+       console.log(`graphic attributes are  is : ${ Attribute10.Attribute10Values}`)
+     }
+
+   })
+
+ }
+};
+  
+    Scrapper();
+  //   async function variants(url) {
+  //     const res = await axios.get(url);
+  //    const $ = cheerio.load(res.data);
+     
+  //    $('#tm-epo-field-1 > div > .cpf_hide_element ').map(async (index, ele) => {
+  //      const variants = $(ele).find($('.tm-epo-field-label')).text();
+  //      const value = $(ele).find($('.tmcp-field')).text();
+      
+  //      if (variants === 'Size') {
+  //       let size= $(ele).find($('.tmcp-field'));
+  //       Attribute1.Attribute1Name = variants;
+  //       console.log(`Name is : ${Attribute1.Attribute1Name}`)
+  //      let options = $(size).find('.tc-multiple-option');
+  //      options.map( async (i,e) => {
+  //        const attribute1 = $(e).text();
+  //        Attribute1.Attribute1Values.push(attribute1);
+  //      })
+  //        console.log(`Size attributes are  is : ${ Attribute1.Attribute1Values}`)
+
+  //      } else if (variants === 'Material') {
+  //      let  material= $(ele).find($('.tmcp-field'));
+  //       Attribute2.Attribute2Name = variants;
+  //       console.log(`Name is : ${Attribute2.Attribute2Name }`)
+  //      let options = $(material).find('.tc-multiple-option');
+  //      options.map( async (i,e) => {
+  //        const attribute2 = $(e).text();
+  //        Attribute2.Attribute2Values.push(attribute2);
+  //      })
+  //        console.log(`material attributes are  is : ${ Attribute2.Attribute2Values}`)
+  //      } else if (variants === 'Print Options') {
+  //      let  printOptions= $(ele).find($('.tmcp-field'));
+  //       Attribute3.Attribute3Name = variants;
+  //       console.log(`Name is : ${Attribute3.Attribute3Name }`)
+  //      let options = $(printOptions).find('.tc-multiple-option');
+  //      options.map( async (i,e) => {
+  //        const attribute3 = $(e).text();
+  //        Attribute3.Attribute3Values.push(attribute3);
+  //      })
+  //        console.log(`printOptions attributes are  is : ${ Attribute3.Attribute3Values}`)
+  //      } else if (variants === 'Lamination') {
+  //       let laminations= $(ele).find($('.tmcp-field'));
+  //       Attribute4.Attribute4Name = variants;
+  //       console.log(`Name is : ${Attribute4.Attribute4Name }`)
+  //      let options = $(laminations).find('.tc-multiple-option');
+  //      options.map( async (i,e) => {
+  //        const attribute4 = $(e).text();
+  //        Attribute4.Attribute4Values.push(attribute4);
+  //      })
+  //        console.log(`laminations attributes are  is : ${ Attribute4.Attribute4Values}`)
+  //      } else if (variants === 'Artwork') {
+  //       let artwork= $(ele).find($('.tmcp-field'));
+  //       Attribute5.Attribute5Name = variants;
+  //       console.log(`Name is : ${Attribute5.Attribute5Name }`)
+  //      let options = $(artwork).find('.tc-multiple-option');
+  //      options.map( async (i,e) => {
+  //        const attribute5 = $(e).text();
+  //        Attribute5.Attribute5Values.push(attribute5);
+  //      })
+  //        console.log(`artwork attributes are  is : ${ Attribute5.Attribute5Values}`)
+  //      } else if (variants === 'PDF Proof') {
+  //       let pdfProof= $(ele).find($('.tmcp-field'));
+  //       Attribute6.Attribute6Name = variants;
+  //       console.log(`Name is : ${Attribute6.Attribute6Name }`)
+  //      let options = $(pdfProof).find('.tc-multiple-option');
+  //      options.map( async (i,e) => {
+  //        const attribute6 = $(e).text();
+  //        Attribute6.Attribute6Values.push(attribute6);
+  //      })
+  //        console.log(`pdfProof attributes are  is : ${ Attribute6.Attribute6Values}`)
+  //      } else if (variants === 'Quantity') {
+  //       let quantity= $(ele).find($('.tmcp-field'));
+  //       Attribute7.Attribute7Name = variants;
+  //       console.log(`Name is : ${Attribute7.Attribute7Name }`)
+  //      let options = $(quantity).find('.tc-multiple-option');
+  //      options.map( async (i,e) => {
+  //        const attribute7 = $(e).text();
+  //        Attribute7.Attribute7Values.push(attribute7);
+  //      })
+  //        console.log(`quantity attributes are  is : ${ Attribute7.Attribute7Values}`)
+  //      } else if (variants === 'Delivery') {
+  //       let delievery= $(ele).find($('.tmcp-field'));
+  //       Attribute8.Attribute8Name = variants;
+  //       console.log(`Name is : ${Attribute8.Attribute8Name }`)
+  //      let options = $(delievery).find('.tc-multiple-option');
+  //      options.map( async (i,e) => {
+  //        const attribute8 = $(e).text();
+  //        Attribute8.Attribute8Values.push(attribute8);
+  //      })
+  //        console.log(`delievery attributes are  is : ${ Attribute8.Attribute8Values}`)
+  //      } else if (variants === 'Colour') {
+  //       let color = $(ele).find($('.tmcp-field'));
+  //       Attribute9.Attribute9Name = variants;
+  //       console.log(`Name is : ${Attribute9.Attribute9Name }`)
+  //      let options = $(color).find('.tc-multiple-option');
+  //      options.map( async (i,e) => {
+  //        const attribute9 = $(e).text();
+  //        Attribute9.Attribute9Values.push(attribute9);
+  //      })
+  //        console.log(`color  attributes are  is : ${ Attribute9.Attribute9Values}`)
+  //      } else if (variants === 'Graphics') {
+  //      let  graphic= $(ele).find($('.tmcp-field'));
+  //       Attribute10.Attribute10Name = variants;
+  //       console.log(`Name is : ${Attribute10.Attribute10Name }`)
+  //      let options = $(graphic).find('.tc-multiple-option');
+  //      options.map( async (i,e) => {
+  //        const attribute10 = $(e).text();
+  //        Attribute10.Attribute10Values.push(attribute10);
+  //      })
+  //        console.log(`graphic attributes are  is : ${ Attribute10.Attribute10Values}`)
+  //      }
+ 
+  //    })
+ 
+  //  }
+  // //  variants('https://cheapasprints.com/product/rounded-pavement-signs/');
