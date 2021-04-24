@@ -69,3 +69,7 @@ module.exports.Attribute1 = {
    
        return {  attributeName , attributeValue , attributeVisible , attributeGlobal }
    }
+
+
+
+

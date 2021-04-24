@@ -7,7 +7,7 @@ const { Parser } = require('json2csv');
 
  
 
-const nData = [];
+let nData = [];
 let ID;
 let Type;
 let Name;
@@ -82,56 +82,102 @@ async function Scrapper(){
         
         await variants(url);
         // let attribute1Name = Attribute1.Attribute1Name;
-        let {  attributeName , attributeValue } = Attributes(Attribute1);
+        let {  attributeName , attributeValue , AttributeVisible , AttributeGlobal } = Attributes(Attribute1);
+        let attribute2 = Attributes(Attribute1);
 
         console.log('function values are :  ' + attributeName, attributeValue);
         try {
+            rowData =  {
+              "ID":ID,
+              Type,
+              SKU,
+              Name,
+              Published,
+              isFeatured,
+              Visibilityincatalogue,
+              Shortdescription,
+              Description,
+              Datesalepriceends,
+              Taxstatus,
+              Taxclass,
+              Instock,
+              Stock,
+              LowStockAmount,
+              BackordersAllowed  ,
+              SoldIndividuall,
+              WeightKG,
+              LengthCM,
+              WidthCM,
+              HeightCM,
+              AllowCustomerReviews,
+              PurchaseNote,
+              SalePrice,
+              RegularPrice,
+              Categories,
+              Tags,
+              ShippingClass,
+              Position  ,
+              price,
+              shortDescription,
+              imageUrl,
+            }
             
-                nData.push({
-                  ID,
-                  Type,
-                  SKU,
-                  Name,
-                  Published,
-                  isFeatured,
-                  Visibilityincatalogue,
-                  Shortdescription,
-                  Description,
-                  Datesalepriceends,
-                  Taxstatus,
-                  Taxclass,
-                  Instock,
-                  Stock,
-                  LowStockAmount,
-                  BackordersAllowed  ,
-                  SoldIndividuall,
-                  WeightKG,
-                  LengthCM,
-                  WidthCM,
-                  HeightCM,
-                  AllowCustomerReviews,
-                  PurchaseNote,
-                  SalePrice,
-                  RegularPrice,
-                  Categories,
-                  Tags,
-                  ShippingClass,
-                  Position  ,
-                  price,
-                  shortDescription,
-                  imageUrl,
-                  attributeName
-                  
-  
-                })
+            // "Attribute 1 name":attributeName,
+            // "Attribute 1 value(s)":attributeValue,
+            // "Attribute 1 visible":AttributeVisible,
+            // "Attribute 1 global": AttributeGlobal,
+            index = 1
+
+            if (attributeName=="Size"){
+              index=1
+              
+            } 
+            else if(attributeName=="Material" ){
+              index=2
+              
+            }
+            else if(attributeName=="Material" ){
+              index=3
+              
+            }
+            else if(attributeName=="Material" ){
+              index=4
+              
+            }
+            else if(attributeName=="Material" ){
+              index=5
+              
+            }
+            else if(attributeName=="Material" ){
+              index=6
+              
+            }
+            else if(attributeName=="Material" ){
+              index=7
+              
+            }
+            else if(attributeName=="Material" ){
+              index=8
+              
+            }
+            else if(attributeName=="Material" ){
+              index=9
+              
+            }
+            else if(attributeName=="Material" ){
+
+              index=10
+            }
+
+            nData.push(rowData);
               
           // Create  a  folder for each product 
              
-          //   const parser = new Parser
-          //   const csv = parser.parse(nData);
-          // fs.writeFileSync('productsData.csv', csv, 'utf-8');
-          // // await  imageDownloader(imageUrl,imgPath)
-          //   console.log(csv);
+            const parser = new Parser
+            const csv = parser.parse(nData);
+          fs.writeFileSync('productsData.csv', csv, 'utf-8');
+          // await  imageDownloader(imageUrl,imgPath)
+            console.log(csv);
           } catch(error){
             console.log(`Error's : ${error}`)
           }
@@ -170,7 +216,7 @@ async function Scrapper(){
      let options = $(material).find('.tc-multiple-option');
      options.map( async (i,e) => {
        const attribute2 = $(e).text();
-       Attribute2.Attribute2Values.push(attribute2);
+       Attribute2.AttributeValues.push(attribute2);
      })
        console.log(`material attributes are  is : ${ Attribute2.AttributeValues}`)
      } else if (variants === 'Print Options') {
@@ -180,7 +226,7 @@ async function Scrapper(){
      let options = $(printOptions).find('.tc-multiple-option');
      options.map( async (i,e) => {
        const attribute3 = $(e).text();
-       Attribute3.Attribute3Values.push(attribute3);
+       Attribute3.AttributeValues.push(attribute3);
      })
        console.log(`printOptions attributes are  is : ${ Attribute3.AttributeValues}`)
      } else if (variants === 'Lamination') {
@@ -190,7 +236,7 @@ async function Scrapper(){
      let options = $(laminations).find('.tc-multiple-option');
      options.map( async (i,e) => {
        const attribute4 = $(e).text();
-       Attribute4.Attribute4Values.push(attribute4);
+       Attribute4.AttributeValues.push(attribute4);
      })
        console.log(`laminations attributes are  is : ${ Attribute4.AttributeValues}`)
      } else if (variants === 'Artwork') {
@@ -200,7 +246,7 @@ async function Scrapper(){
      let options = $(artwork).find('.tc-multiple-option');
      options.map( async (i,e) => {
        const attribute5 = $(e).text();
-       Attribute5.Attribute5Values.push(attribute5);
+       Attribute5.AttributeValues.push(attribute5);
      })
        console.log(`artwork attributes are  is : ${ Attribute5.AttributeValues}`)
      } else if (variants === 'PDF Proof') {
@@ -210,7 +256,7 @@ async function Scrapper(){
      let options = $(pdfProof).find('.tc-multiple-option');
      options.map( async (i,e) => {
        const attribute6 = $(e).text();
-       Attribute6.Attribute6Values.push(attribute6);
+       Attribute6.AttributeValues.push(attribute6);
      })
        console.log(`pdfProof attributes are  is : ${ Attribute6.AttributeValues}`)
      } else if (variants === 'Quantity') {
@@ -220,7 +266,7 @@ async function Scrapper(){
      let options = $(quantity).find('.tc-multiple-option');
      options.map( async (i,e) => {
        const attribute7 = $(e).text();
-       Attribute7.Attribute7Values.push(attribute7);
+       Attribute7.AttributeValues.push(attribute7);
      })
        console.log(`quantity attributes are  is : ${ Attribute7.AttributeValues}`)
      } else if (variants === 'Delivery') {
@@ -230,7 +276,7 @@ async function Scrapper(){
      let options = $(delievery).find('.tc-multiple-option');
      options.map( async (i,e) => {
        const attribute8 = $(e).text();
-       Attribute8.Attribute8Values.push(attribute8);
+       Attribute8.AttributeValues.push(attribute8);
      })
        console.log(`delievery attributes are  is : ${ Attribute8.AttributeValues}`)
      } else if (variants === 'Colour') {
@@ -240,7 +286,7 @@ async function Scrapper(){
      let options = $(color).find('.tc-multiple-option');
      options.map( async (i,e) => {
        const attribute9 = $(e).text();
-       Attribute9.Attribute9Values.push(attribute9);
+       Attribute9.AttributeValues.push(attribute9);
      })
        console.log(`color  attributes are  is : ${ Attribute9.AttributeValues}`)
      } else if (variants === 'Graphics') {
