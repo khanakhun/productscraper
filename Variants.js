@@ -1,59 +1,65 @@
 module.exports.Attribute1 = {
-    AttributeName: 'kashan',
+    AttributeName: '',
     AttributeValues: [],
     AttributeVisible : 1,
     AttributeGlobal :1,
    }
    module.exports.Attribute2 = {
-    AttributeName: 'kashan',
+    AttributeName: '',
     AttributeValues: [],
     AttributeVisible : 1,
     AttributeGlobal :1,
    }
    module.exports.Attribute3 = {
-    AttributeName: 'kashan',
+    AttributeName: '',
     AttributeValues: [],
     AttributeVisible : 1,
     AttributeGlobal :1,
    }
    module.exports.Attribute4 = {
-    AttributeName: 'kashan',
+    AttributeName: '',
     AttributeValues: [],
     AttributeVisible : 1,
     AttributeGlobal :1,
    }
    module.exports.Attribute5 = {
-       AttributeName: 'kashan',
+       AttributeName: '',
        AttributeValues: [],
        AttributeVisible : 1,
        AttributeGlobal :1,
    }
    module.exports.Attribute6 = {
-       AttributeName: 'kashan',
+       AttributeName: '',
        AttributeValues: [],
        AttributeVisible : 1,
        AttributeGlobal :1,
    }
    module.exports.Attribute7 = {
-       AttributeName: 'kashan',
+       AttributeName: '',
        AttributeValues: [],
        AttributeVisible : 1,
        AttributeGlobal :1,
    }
    module.exports.Attribute8 = {
-       AttributeName: 'kashan',
+       AttributeName: '',
        AttributeValues: [],
        AttributeVisible : 1,
        AttributeGlobal :1,
    }
    module.exports.Attribute9 = {
-       AttributeName: 'kashan',
+       AttributeName: '',
        AttributeValues: [],
        AttributeVisible : 1,
        AttributeGlobal :1,
    }
    module.exports.Attribute10 = {
-       AttributeName: 'kashan',
+       AttributeName: '',
+       AttributeValues: [],
+       AttributeVisible : 1,
+       AttributeGlobal :1,
+   }
+   module.exports.Attribute11 = {
+       AttributeName: '',
        AttributeValues: [],
        AttributeVisible : 1,
        AttributeGlobal :1,
